@@ -1,0 +1,65 @@
+# This is your sidebar TOC. The sidebar code loops through sections here and provides the appropriate formatting.
+
+entries:
+- title: sidebar
+  product: API Documentation
+  version: 
+  folders:
+
+  - title:
+    output: pdf
+    type: frontmatter
+    folderitems:
+    - title:
+      url: /titlepage.html
+      output: pdf
+      type: frontmatter
+    - title:
+      url: /tocpage.html
+      output: pdf
+      type: frontmatter
+
+  - title: About  CryptoExchange  API
+    output: web, pdf
+    folderitems:
+
+    - title: Client configuration
+      url: /index.html#client-configuration
+      output: web, pdf
+      type: homepage
+
+    - title: Latest rates
+      url: /index.html#latest-rates
+      output: web, pdf
+
+    - title: Creating new address
+      url: /index.html#creating-new-address
+      output: web, pdf
+
+    - title: Validating  an  address
+      url: /index.html#validating-an-address
+      output: web, pdf
+
+    - title: Address balance
+      url: /index.html#address-balance
+      output: web, pdf
+
+    - title: Placing buy order
+      url: /index.html#placing-buy-order
+      output: web, pdf
+    
+    - title: Getting order status
+      url: /index.html#getting-order-status
+      output: web, pdf
+      
+    - title: Listing all orders for customer
+      url: /index.html#listing-all-orders-for-customer
+      output: web, pdf
+
+  - title: Crypto Exchange API
+    output: web, pdf
+    folderitems:
+
+    - title: Exchange API
+      url: /mydoc_crypto_exchange_api.html
+      output: web, pdf

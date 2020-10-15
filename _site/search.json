@@ -1,0 +1,18 @@
+[
+
+  {
+  "title": "About CryptoExchange API",
+  "tags": "",
+  "keywords": "CryptoExchange API",
+  "url": "index.html",
+  "summary": "With CryptoExchange API, clients can quickly enable fiat-to-crypto exchange in their own applications. Following versions of the API will enable crypto-to- fiat, other usful actions and features."
+  },
+  {
+  "title": "Crypto Exchange API",
+  "tags": "",
+  "keywords": "API swagger crypto exchange",
+  "url": "mydoc_crypto_exchange_api",
+  "summary": "​Several actions are available to enable buying crypto currencies. Expected sequence of actions is displayed on following diagram:"
+  }
+
+]

@@ -1,0 +1,428 @@
+openapi: 3.0.0
+info:
+    title: Exchange API
+    description: 'Crypto Exchange API'
+    version: '1.0'
+    contact:
+        name: Tomas Kronvall
+        email: tomas.kronvall@goobit.se
+tags:
+    - name: api
+servers:
+    - url: 'https://api-test.bt.cx/exchange/v1'
+      description: Test
+    - url: 'https://api.bt.cx/exchange/v1'
+      description: Production
+components:
+    securitySchemes:
+        ApiKeyAuth:
+            type: apiKey
+            in: header
+            name: X-API-Key
+    schemas:
+        Error:
+            title: Error
+            type: object
+            required:
+                - action
+                - code
+                - message
+            properties:
+                action:
+                    type: string
+                code:
+                    type: number
+                message:
+                    type: string
+        PlaceOrderRequest:
+            title: PlaceOrderRequest
+            required:
+                - buyCurrency
+                - cryptoAddress
+                - networkFee
+                - personNumber
+                - sellAmount
+                - timestamp
+            type: object
+            properties:
+                buyCurrency:
+                    type: string
+                cryptoAddress:
+                    type: string
+                networkFee:
+                    type: number
+                personNumber:
+                    type: string
+                sellAmount:
+                    type: string
+                timestamp:
+                    type: string
+            example:
+                buyCurrency: BTC
+                cryptoAddress: 3CMCRgEm8HVz3DrWaCCid3vAANE42jcEv9
+                networkFee: 2.5899999999999999
+                personNumber: 20001212-1471
+                sellAmount: 1000
+                timestamp: 2020-01-27T06:33:54.044Z
+        GenerateAddressRequest:
+            title: GenerateAddressRequest
+            required:
+                - encrypt
+            type: object
+            properties:
+                encrypt:
+                    type: boolean
+            example:
+                encrypt: false
+    responses:
+        NotFound:
+            description: The specified resource was not found
+            content:
+                application/json:
+                    schema:
+                        $ref: '#/components/schemas/Error'
+        Unauthorized:
+            description: Unauthorized
+            content:
+                application/json:
+                    schema:
+                        $ref: '#/components/schemas/Error'
+        BadRequest:
+            description: Bad request
+            content:
+                application/json:
+                    schema:
+                        $ref: '#/components/schemas/Error'
+        ServerError:
+            description: Server error
+            content:
+                application/json:
+                    schema:
+                        $ref: '#/components/schemas/Error'
+paths:
+    /data:
+        get:
+            tags:
+                - api
+            summary: Exchange data
+            operationId: exchange-data
+            description: Exchange client config data
+            security:
+                - ApiKeyAuth: []
+            responses:
+                200:
+                    description: 'OK'
+                    content:
+                        application/json:
+                            examples:
+                                example-1:
+                                    value:
+                                        config:
+                                            ageLimits:
+                                                block: 16
+                                                warn: 18
+                                            buyLimit: 10000
+                                            rates:
+                                                - from: SEK
+                                                  to: BTC
+                                                  toName: Bitcoin
+                                                  rate: 35159.1564
+                                                  networkFee: 0.57528818067936
+                                                - from: SEK
+                                                  to: ETH
+                                                  toName: Ether
+                                                  rate: 1154.887548
+                                                  networkFee: 0
+                401:
+                    $ref: '#/components/responses/Unauthorized'
+                500:
+                    $ref: '#/components/responses/ServerError'
+
+    /rates:
+        get:
+            tags:
+                - api
+            summary: Rates
+            operationId: rates
+            description: Latest exchange rates
+            security:
+                - ApiKeyAuth: []
+            responses:
+                200:
+                    description: 'OK'
+                    content:
+                        application/json:
+                            examples:
+                                example-1:
+                                    value:
+                                        - from: SEK
+                                          to: BTC
+                                          toName: Bitcoin
+                                          rate: 35159.1564
+                                          networkFee: 0.57528818067936
+                                        - from: SEK
+                                          to: ETH
+                                          toName: Ether
+                                          rate: 1154.887548
+                                          networkFee: 0
+                401:
+                    $ref: '#/components/responses/Unauthorized'
+                500:
+                    $ref: '#/components/responses/ServerError'
+
+    /orders:
+        post:
+            tags:
+                - api
+            summary: Place Order
+            operationId: place-order
+            description: Place new buy order
+            security:
+                - ApiKeyAuth: []
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/PlaceOrderRequest'
+                        example:
+                            buyCurrency: BTC
+                            cryptoAddress: 3CMCRgEm8HVz3DrWaCCid3vAANE42jcEv9
+                            networkFee: 2.5899999999999999
+                            personNumber: 20001212-1471
+                            sellAmount: 123
+                            timestamp: 2020-01-27T06:33:54.044Z
+                required: true
+            responses:
+                200:
+                    description: 'OK'
+                    content:
+                        application/json:
+                            examples:
+                                example-1:
+                                    value:
+                                        action: ok
+                                        uuid: a7c99565-f175-4db8-ab48-4006a3d5ab52
+                400:
+                    $ref: '#/components/responses/BadRequest'
+                401:
+                    $ref: '#/components/responses/Unauthorized'
+                500:
+                    $ref: '#/components/responses/ServerError'
+        get:
+            tags:
+                - api
+            summary: Get Orders
+            operationId: get-orders
+            description: Get orders for customer
+            security:
+                - ApiKeyAuth: []
+            parameters:
+                - name: personNumber
+                  in: query
+                  required: true
+                  style: form
+                  explode: true
+                  schema:
+                      type: string
+                      example: '20000101-0107'
+            responses:
+                200:
+                    description: 'OK'
+                    content:
+                        application/json:
+                            examples:
+                                example-1:
+                                    value:
+                                        action: ok
+                                        data:
+                                            - personNumber: 20001212-1471
+                                              sellAmount: '123.00'
+                                              buyCurrency: BTC
+                                              payNetworkFee: 2.59
+                                              cryptoAddress: 3CMCRgEm8HVz3DrWaCCid3vAANE42jcEv9
+                                              buyAmount: '0.00342471'
+                                              sellCurrency: SEK
+                                              paymentMethodName: Swedbank
+                                              orderId: local59
+                                              timestamp: '2020-10-06T16:46:47.741Z'
+                                              uuid: a7c99565-f175-4db8-ab48-4006a3d5ab52
+                400:
+                    $ref: '#/components/responses/BadRequest'
+                401:
+                    $ref: '#/components/responses/Unauthorized'
+                500:
+                    $ref: '#/components/responses/ServerError'
+
+    /orders/{uuid}:
+        get:
+            tags:
+                - api
+            summary: Get Order
+            operationId: get-order
+            description: Get order
+            security:
+                - ApiKeyAuth: []
+            parameters:
+                - name: uuid
+                  in: path
+                  required: true
+                  style: simple
+                  schema:
+                      type: string
+                      example: a7c99565-f175-4db8-ab48-4006a3d5ab52
+            responses:
+                200:
+                    description: 'OK'
+                    content:
+                        application/json:
+                            examples:
+                                example-1:
+                                    value:
+                                        action: ok
+                                        data:
+                                            personNumber: 20001212-1471
+                                            sellAmount: '123.00'
+                                            buyCurrency: BTC
+                                            payNetworkFee: 2.59
+                                            cryptoAddress: 3CMCRgEm8HVz3DrWaCCid3vAANE42jcEv9
+                                            buyAmount: '0.00342471'
+                                            sellCurrency: SEK
+                                            paymentMethodName: Swedbank
+                                            orderId: local59
+                                            timestamp: '2020-10-06T16:46:47.741Z'
+                                            uuid: a7c99565-f175-4db8-ab48-4006a3d5ab52
+                400:
+                    $ref: '#/components/responses/BadRequest'
+                401:
+                    $ref: '#/components/responses/Unauthorized'
+                500:
+                    $ref: '#/components/responses/ServerError'
+
+    /addresses/{symbol}:
+        post:
+            tags:
+                - api
+            summary: Generate address
+            operationId: generate-address
+            description: Generate address
+            security:
+                - ApiKeyAuth: []
+            parameters:
+                - name: symbol
+                  in: path
+                  required: true
+                  style: simple
+                  schema:
+                      type: string
+                      example: 'BTC'
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/GenerateAddressRequest'
+                        example:
+                            encrypt: false
+                required: true
+            responses:
+                200:
+                    description: 'OK'
+                    content:
+                        application/json:
+                            examples:
+                                example-1:
+                                    value:
+                                        action: ok
+                                        address: 1Be34XEEEiRbAp2cdRaRQ7Vs1DT86vwEAo
+                                        pkey: Kyou6Tt2rVzJS6N45SdUo61cq7K6FPvAEm5nJBWYimK4bY19Mo6c
+                400:
+                    $ref: '#/components/responses/BadRequest'
+                401:
+                    $ref: '#/components/responses/Unauthorized'
+                500:
+                    $ref: '#/components/responses/ServerError'
+
+    /addresses/{symbol}/{address}:
+        get:
+            tags:
+                - api
+            summary: Validate address
+            operationId: validate-address
+            description: Validate address
+            security:
+                - ApiKeyAuth: []
+            parameters:
+                - name: symbol
+                  in: path
+                  required: true
+                  style: simple
+                  schema:
+                      type: string
+                      example: 'BTC'
+                - name: address
+                  in: path
+                  required: true
+                  style: simple
+                  schema:
+                      type: string
+                      example: '1Be34XEEEiRbAp2cdRaRQ7Vs1DT86vwEAo'
+            responses:
+                200:
+                    description: 'OK'
+                    content:
+                        application/json:
+                            examples:
+                                example-1:
+                                    value:
+                                        action: ok
+                                        symbol: BTC
+                                        address: 1Be34XEEEiRbAp2cdRaRQ7Vs1DT86vwEAo
+                                        valid: true
+                400:
+                    $ref: '#/components/responses/BadRequest'
+                401:
+                    $ref: '#/components/responses/Unauthorized'
+                500:
+                    $ref: '#/components/responses/ServerError'
+
+    /addresses/{symbol}/{address}/balance:
+        get:
+            tags:
+                - api
+            summary: Get balance
+            operationId: get-balance
+            description: Get balance
+            security:
+                - ApiKeyAuth: []
+            parameters:
+                - name: symbol
+                  in: path
+                  required: true
+                  style: simple
+                  schema:
+                      type: string
+                      example: 'BTC'
+                - name: address
+                  in: path
+                  required: true
+                  style: simple
+                  schema:
+                      type: string
+                      example: '1Be34XEEEiRbAp2cdRaRQ7Vs1DT86vwEAo'
+            responses:
+                200:
+                    description: 'OK'
+                    content:
+                        application/json:
+                            examples:
+                                example-1:
+                                    value:
+                                        action: ok
+                                        address: 1Be34XEEEiRbAp2cdRaRQ7Vs1DT86vwEAo
+                                        balance: 10000000
+                400:
+                    $ref: '#/components/responses/BadRequest'
+                401:
+                    $ref: '#/components/responses/Unauthorized'
+                500:
+                    $ref: '#/components/responses/ServerError'
+
