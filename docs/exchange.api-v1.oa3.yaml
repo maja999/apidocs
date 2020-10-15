@@ -9,8 +9,8 @@ info:
 tags:
     - name: api
 servers:
-    - url: 'https://api-test.bt.cx/exchange/v1'
-      description: Test
+    - url: 'https://api.sandbox.bt.cx/exchange/v1'
+      description: Sandbox
     - url: 'https://api.bt.cx/exchange/v1'
       description: Production
 components:
